@@ -1,10 +1,12 @@
-let s:width = 80 * 2
-let s:height = 32 * 4
+let s:width = winwidth(0) * 2
+let s:height = winheight(0) * 4
 
 let s:vertices = []
 
 let s:row = 0
 let s:col = 0
+
+let s:N = 100
 
 
 function s:rand (range)
@@ -79,16 +81,35 @@ function s:next_point ()
 endfunction
 
 
-function s:next_1000_point ()
-    for l:i in range(1000)
+function s:next_n_point ()
+    for l:i in range(s:N)
         call s:next_point()
     endfor
+endfunction
+
+
+function Statusline ()
+    return s:N
+endfunction
+
+
+function s:increase_n ()
+    let s:N += 100
+endfunction
+
+
+function s:decrease_n ()
+    if s:N > 100
+        let s:N -= 100
+    endif
 endfunction
 
 
 function s:main ()
     setlocal buftype=nofile
     setlocal noswapfile
+    set nonu
+    set statusline=%{Statusline()}
 
     call add(s:vertices, [
                 \ s:rand(s:height/4),
@@ -114,7 +135,9 @@ endfunction
 
 
 nnoremap <space> :call <SID>next_point()<CR>
-nnoremap <cr> :call <SID>next_1000_point()<CR>
+nnoremap <cr> :call <SID>next_n_point()<CR>
+nnoremap + :call <SID>increase_n()<CR>
+nnoremap - :call <SID>decrease_n()<CR>
 
 
 call s:main()
