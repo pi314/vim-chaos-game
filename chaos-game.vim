@@ -1,3 +1,12 @@
+" =========================================================================== "
+" Chaos game
+" Author: pi314 (cychih)
+"
+" Recommanded usage:
+"
+"   $ vim -u NONE '+source chaos-game.vim'
+" =========================================================================== "
+
 let s:width = winwidth(0) * 2
 let s:height = winheight(0) * 4
 
@@ -105,12 +114,15 @@ function s:decrease_n ()
 endfunction
 
 
-function s:main ()
-    setlocal buftype=nofile
-    setlocal noswapfile
-    set nonu
-    set statusline=%{Statusline()}
+setlocal buftype=nofile
+setlocal noswapfile
+set nonu
+set statusline=%{Statusline()}
+set laststatus=2
+set cpo=aABceFs
+set clipboard=exclude:.*
 
+function s:main ()
     call add(s:vertices, [
                 \ s:rand(s:height/4),
                 \ s:rand(s:width/2) + s:width/4
