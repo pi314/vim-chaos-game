@@ -7,13 +7,13 @@
 "   $ vim -u NONE '+source chaos-game.vim'
 " =========================================================================== "
 
-let s:width = winwidth(0) * 2
-let s:height = winheight(0) * 4
+let s:width = (winwidth(0) - 1) * 2
+let s:height = (winheight(0) - 1) * 4
 
 let s:vertices = []
 
-let s:row = 0
-let s:col = 0
+let s:row = -1
+let s:col = -1
 
 let s:N = 100
 
@@ -83,6 +83,10 @@ endfunction
 
 
 function s:next_point ()
+    if s:row == -1 || s:col == -1
+        let [s:row, s:col] = s:get_cursor_pos()
+    endif
+
     let l:dice = s:rand(len(s:vertices))
     let s:row = (s:row + s:vertices[l:dice][0]) / 2
     let s:col = (s:col + s:vertices[l:dice][1]) / 2
@@ -114,6 +118,22 @@ function s:decrease_n ()
 endfunction
 
 
+function s:get_cursor_pos ()
+    let l:pos = getpos('.')
+    let l:row = (l:pos[1] - 1) * 4
+    let l:col = s:vwidth(strpart(getline('.'), 0, l:pos[2] - 1)) * 2
+    return [l:row, l:col]
+endfunction
+
+
+function s:create_vertex ()
+    retab
+    let l:pos = s:get_cursor_pos()
+    call s:plot(l:pos[0], l:pos[1])
+    call add(s:vertices, l:pos)
+endfunction
+
+
 setlocal buftype=nofile
 setlocal noswapfile
 set nonu
@@ -121,8 +141,12 @@ set statusline=%{Statusline()}
 set laststatus=2
 set cpo=aABceFs
 set clipboard=exclude:.*
+set expandtab
 
-function s:main ()
+
+function s:setup_demo_value ()
+    call s:canvus_init()
+    let s:vertices = []
     call add(s:vertices, [
                 \ s:rand(s:height/4),
                 \ s:rand(s:width/2) + s:width/4
@@ -136,7 +160,7 @@ function s:main ()
                 \ s:rand(s:width/4) + 3*s:width/4
                 \ ])
 
-    for l:i in range(len(s:vertices))
+    for l:i in range(3)
         call s:plot(s:vertices[(l:i)][0], s:vertices[(l:i)][1])
     endfor
 
@@ -146,10 +170,22 @@ function s:main ()
 endfunction
 
 
+function s:canvus_init ()
+    normal! ggdG
+    let l:canvas_line = repeat(' ', winwidth(0) - 1) . '|'
+    call setline('.', l:canvas_line)
+    for l:i in range(winheight(0) - 1)
+        call append('$', l:canvas_line)
+    endfor
+endfunction
+
+
 nnoremap <space> :call <SID>next_point()<CR>
 nnoremap <cr> :call <SID>next_n_point()<CR>
 nnoremap + :call <SID>increase_n()<CR>
 nnoremap - :call <SID>decrease_n()<CR>
+nnoremap C :call <SID>create_vertex()<CR>
+nnoremap D :call <SID>setup_demo_value()<CR>
 
 
-call s:main()
+call s:canvus_init()
