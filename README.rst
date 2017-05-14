@@ -17,3 +17,5 @@ Keys:
 * ``<CR>`` - next N step (default 100)
 * ``+`` - increase N by 100
 * ``-`` - decrease N by 100 (minimum 100)
+* ``C`` - create vertices
+* ``D`` - setup a demo value (i.e., 3 peudo-random vertices and a random start point)
